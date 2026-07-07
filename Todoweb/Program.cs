@@ -6,69 +6,92 @@ builder.Services.AddDbContext<TodoDb>(opt => opt.UseInMemoryDatabase("TodoList")
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 var app = builder.Build();
 
-app.MapGet("/todoitems", async (TodoDb db) =>
-    await db.Todos.ToListAsync());
+var todoItems = app.MapGroup("/todoitems");
 
-app.MapGet("/todoitems/complete", async (TodoDb db) =>
-    await db.Todos.Where(t => t.IsComplete).ToListAsync());
+todoItems.MapGet("/", GetAllTodos);
+todoItems.MapGet("/complete", GetCompleteTodos);
+todoItems.MapGet("/notcomplete", GetNotCompleteTodos);
+todoItems.MapGet("/priority/{todoPriority}", GetPriorityTodos);
+todoItems.MapGet("/{id}", GetTodo);
+todoItems.MapPost("/", CreateTodo);
+todoItems.MapPut("/{id}", UpdateTodo);
+todoItems.MapPatch("/{id}", PatchTodo);
+todoItems.MapDelete("/", DeleteTodo);
 
-app.MapGet("/todoitems/notcomplete", async (TodoDb db) =>
-    await db.Todos.Where(t => !t.IsComplete).ToListAsync());
+app.Run();
 
-app.MapGet("/todoitems/lowpriority", async (TodoDb db) =>
-    await db.Todos.Where(t => t.TodoPriority == Todo.Priority.Low_Priority).ToListAsync());
+static async Task<IResult> GetAllTodos(TodoDb db)
+{
+    return TypedResults.Ok(await db.Todos.Select(x => new TodoItemDto(x)).ToArrayAsync());
+}
 
-app.MapGet("/todoitems/normalpriority", async (TodoDb db) =>
-    await db.Todos.Where(t => t.TodoPriority == Todo.Priority.Normal_Priority).ToListAsync());
+static async Task<IResult> GetCompleteTodos(TodoDb db)
+{
+    return TypedResults.Ok(await db.Todos.Where(t => t.IsComplete).Select(x => new TodoItemDto(x)).ToListAsync());
+}
 
-app.MapGet("/todoitems/urgentpriority", async (TodoDb db) =>
-    await db.Todos.Where(t => t.TodoPriority == Todo.Priority.Urgent_Priority).ToListAsync());
+static async Task<IResult> GetNotCompleteTodos(TodoDb db)
+{
+    return TypedResults.Ok(await db.Todos.Where(t => !t.IsComplete).Select(x => new TodoItemDto(x)).ToListAsync());
+}
 
-app.MapGet("/todoitems/{id}", async (int id, TodoDb db) =>
-    await db.Todos.FindAsync(id)
+static async Task<IResult> GetPriorityTodos(Todo.Priority todoPriority, TodoDb db)
+{
+    return TypedResults.Ok(await db.Todos.Where(t => t.TodoPriority == todoPriority).Select(x => new TodoItemDto(x)).ToListAsync());
+}
+
+static async Task<IResult> GetTodo(int id, TodoDb db)
+{
+    return await db.Todos.FindAsync(id)
         is Todo todo
-            ? Results.Ok(todo)
-            : Results.NotFound());
+            ? TypedResults.Ok(new TodoItemDto(todo))
+            : TypedResults.NotFound();
+}
 
-app.MapPost("/todoitems", async (Todo todo, TodoDb db) =>
+static async Task<IResult> CreateTodo(Todo todo, TodoDb db)
 {
     db.Todos.Add(todo);
     await db.SaveChangesAsync();
 
-    return Results.Created($"/todoitems/{todo.Id}", todo);
-});
+    TodoItemDto tododto = new TodoItemDto(todo);
 
-app.MapPut("/todoitems/{id}", async (int id, Todo inputTodo, TodoDb db) =>
+    return TypedResults.Created($"/todoitems/{todo.Id}", tododto);
+}
+
+static async Task<IResult> UpdateTodo(int id, TodoItemDto inputTodo, TodoDb db)
 {
     var todo = await db.Todos.FindAsync(id);
 
-    if (todo is null) return Results.NotFound();
+    if (todo is null) return TypedResults.NotFound();
 
     todo.Name = inputTodo.Name;
     todo.IsComplete = inputTodo.IsComplete;
+    todo.TodoPriority = inputTodo.TodoPriority;
+    todo.Description = inputTodo.Description;
+    todo.DueDate = inputTodo.DueDate;
 
     await db.SaveChangesAsync();
 
-    return Results.NoContent();
-});
+    return TypedResults.NoContent();
+}
 
-app.MapDelete("/todoitems/{id}", async (int id, TodoDb db) =>
+static async Task<IResult> DeleteTodo(int id, TodoDb db)
 {
     if (await db.Todos.FindAsync(id) is Todo todo)
     {
         db.Todos.Remove(todo);
         await db.SaveChangesAsync();
-        return Results.NoContent();
+        return TypedResults.NoContent();
     }
 
-    return Results.NotFound();
-});
+    return TypedResults.NotFound();
+}
 
-app.MapPatch("/todoitems/{id}", async (int id, TodoPatchDto inputTodo, TodoDb db) =>
+static async Task<IResult> PatchTodo(int id, TodoPatchDto inputTodo,  TodoDb db)
 {
     var todo = await db.Todos.FindAsync(id);
 
-    if (todo is null) return Results.NotFound();
+    if (todo is null) return TypedResults.NotFound();
 
     if (inputTodo.Name is not null) todo.Name = inputTodo.Name;
     if (inputTodo.IsComplete is not null) todo.IsComplete = inputTodo.IsComplete.Value;
@@ -78,7 +101,5 @@ app.MapPatch("/todoitems/{id}", async (int id, TodoPatchDto inputTodo, TodoDb db
 
     await db.SaveChangesAsync();
 
-    return Results.NoContent();
-});
-
-app.Run();
+    return TypedResults.NoContent();
+}
