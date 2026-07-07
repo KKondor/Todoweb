@@ -10,11 +10,10 @@
         }
         public int Id { get; set; }
         public string? Name { get; set; }
-        public Priority TodoPriority { get; set; }
+        public Priority TodoPriority { get; set; } = Priority.Low_Priority;
         public string? Description { get; set; }
         public bool IsComplete { get; set; }
-        public DateTime CreateDate { get; }
-        public DateTime DueDate { get; set; }
-
+        public DateTime CreateDate { get;} = DateTime.Now;
+        public DateTime? DueDate { get; set; }
     }
 }
