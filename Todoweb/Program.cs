@@ -12,6 +12,9 @@ app.MapGet("/todoitems", async (TodoDb db) =>
 app.MapGet("/todoitems/complete", async (TodoDb db) =>
     await db.Todos.Where(t => t.IsComplete).ToListAsync());
 
+app.MapGet("/todoitems/notcomplete", async (TodoDb db) =>
+    await db.Todos.Where(t => !t.IsComplete).ToListAsync());
+
 app.MapGet("/todoitems/lowpriority", async (TodoDb db) =>
     await db.Todos.Where(t => t.TodoPriority == Todo.Priority.Low_Priority).ToListAsync());
 
