@@ -1,6 +1,6 @@
-﻿using static Todoweb.Todo;
+﻿using static Todoweb.Model.API.Todo;
 
-namespace Todoweb
+namespace Todoweb.Model.API
 {
     public class TodoPatchDto
     {

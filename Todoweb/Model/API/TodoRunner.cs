@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Todoweb;
+using Todoweb.Model.API;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<TodoDb>(opt => opt.UseInMemoryDatabase("TodoList"));

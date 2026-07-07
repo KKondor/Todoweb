@@ -1,0 +1,51 @@
+﻿@Todoweb_HostAddress = https://localhost:7086
+
+POST {{Todoweb_HostAddress}}/todoitems
+Content-Type: application/json
+
+{
+  "name":"finish project",
+  "IsComplete": false
+}
+
+###
+
+GET {{Todoweb_HostAddress}}/todoitems
+
+###
+
+GET {{Todoweb_HostAddress}}/todoitems/complete
+
+###
+
+GET {{Todoweb_HostAddress}}/todoitems/priority/0
+
+###
+
+GET {{Todoweb_HostAddress}}/todoitems/notcomplete
+
+###
+
+GET {{Todoweb_HostAddress}}/todoitems/1
+
+###
+
+PUT {{Todoweb_HostAddress}}/todoitems/1
+Content-Type: application/json
+
+{
+  "name":"Feed Fish",
+  "iscomplete":true
+}
+
+###
+
+
+PATCH {{Todoweb_HostAddress}}/todoitems/1
+Content-Type: application/json
+
+{
+  "todopriority":1
+}
+
+###

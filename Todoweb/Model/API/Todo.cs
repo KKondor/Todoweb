@@ -1,4 +1,4 @@
-﻿namespace Todoweb
+﻿namespace Todoweb.Model.API
 {
     public class Todo
     {
