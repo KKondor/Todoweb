@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using Todoweb.Model.API;
+using Todoweb.Model.Helpers;
 
 namespace Todoweb.Model.Endpoints
 {
@@ -18,27 +21,27 @@ namespace Todoweb.Model.Endpoints
             group.MapDelete("/", DeleteTodo);
         }
 
-        static async Task<IResult> GetAllTodos(TodoDb db)
+        static async Task<Ok<List<TodoItemDto>>> GetAllTodos(TodoDb db)
         {
-            return TypedResults.Ok(await db.Todos.Select(x => new TodoItemDto(x)).ToArrayAsync());
+            return TypedResults.Ok(await db.Todos.Select(x => new TodoItemDto(x)).ToListAsync());
         }
 
-        static async Task<IResult> GetCompleteTodos(TodoDb db)
+        static async Task<Ok<List<TodoItemDto>>> GetCompleteTodos(TodoDb db)
         {
             return TypedResults.Ok(await db.Todos.Where(t => t.IsComplete).Select(x => new TodoItemDto(x)).ToListAsync());
         }
 
-        static async Task<IResult> GetNotCompleteTodos(TodoDb db)
+        static async Task<Ok<List<TodoItemDto>>> GetNotCompleteTodos(TodoDb db)
         {
             return TypedResults.Ok(await db.Todos.Where(t => !t.IsComplete).Select(x => new TodoItemDto(x)).ToListAsync());
         }
 
-        static async Task<IResult> GetPriorityTodos(Todo.Priority todoPriority, TodoDb db)
+        static async Task<Ok<List<TodoItemDto>>> GetPriorityTodos(Todo.Priority todoPriority, TodoDb db)
         {
             return TypedResults.Ok(await db.Todos.Where(t => t.TodoPriority == todoPriority).Select(x => new TodoItemDto(x)).ToListAsync());
         }
 
-        static async Task<IResult> GetTodo(int id, TodoDb db)
+        static async Task<Results<Ok<TodoItemDto>,NotFound>> GetTodo(int id, TodoDb db)
         {
             return await db.Todos.FindAsync(id)
                 is Todo todo
@@ -46,8 +49,12 @@ namespace Todoweb.Model.Endpoints
                     : TypedResults.NotFound();
         }
 
-        static async Task<IResult> CreateTodo(Todo todo, TodoDb db)
+        static async Task<Results<Created<TodoItemDto>,BadRequest<List<ValidationResult>>>> CreateTodo(Todo todo, TodoDb db)
         {
+            var errors = ValidationHelper.Validate(todo);
+            if (errors.Count > 0)
+                return TypedResults.BadRequest(errors);
+
             db.Todos.Add(todo);
             await db.SaveChangesAsync();
 
@@ -56,8 +63,12 @@ namespace Todoweb.Model.Endpoints
             return TypedResults.Created($"/todoitems/{todo.Id}", tododto);
         }
 
-        static async Task<IResult> UpdateTodo(int id, TodoItemDto inputTodo, TodoDb db)
+        static async Task<Results<NoContent,NotFound,BadRequest<List<ValidationResult>>>> UpdateTodo(int id, TodoItemDto inputTodo, TodoDb db)
         {
+            var errors = ValidationHelper.Validate(inputTodo);
+            if (errors.Count > 0)
+                return TypedResults.BadRequest(errors);
+
             var todo = await db.Todos.FindAsync(id);
 
             if (todo is null) return TypedResults.NotFound();
@@ -73,7 +84,7 @@ namespace Todoweb.Model.Endpoints
             return TypedResults.NoContent();
         }
 
-        static async Task<IResult> DeleteTodo(int id, TodoDb db)
+        static async Task<Results<NoContent,NotFound>> DeleteTodo(int id, TodoDb db)
         {
             if (await db.Todos.FindAsync(id) is Todo todo)
             {
@@ -85,8 +96,12 @@ namespace Todoweb.Model.Endpoints
             return TypedResults.NotFound();
         }
 
-        static async Task<IResult> PatchTodo(int id, TodoPatchDto inputTodo, TodoDb db)
+        static async Task<Results<NoContent, NotFound, BadRequest<List<ValidationResult>>>> PatchTodo(int id, TodoPatchDto inputTodo, TodoDb db)
         {
+            var errors = ValidationHelper.Validate(inputTodo);
+            if (errors.Count > 0)
+                return TypedResults.BadRequest(errors);
+
             var todo = await db.Todos.FindAsync(id);
 
             if (todo is null) return TypedResults.NotFound();
