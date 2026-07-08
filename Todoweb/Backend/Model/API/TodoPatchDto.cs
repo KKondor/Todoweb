@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using static Todoweb.Model.API.Todo;
+using static Todoweb.Backend.Model.API.Todo;
 
-namespace Todoweb.Model.API
+namespace Todoweb.Backend.Model.API
 {
     public class TodoPatchDto
     {

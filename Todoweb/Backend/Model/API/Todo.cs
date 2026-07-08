@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Todoweb.Model.API
+namespace Todoweb.Backend.Model.API
 {
     public class Todo
     {

@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using Todoweb.Model.API;
-using Todoweb.Model.Helpers;
+using Todoweb.Backend.Model.API;
+using Todoweb.Backend.Model.Helpers;
+using Todoweb.Backend.Service;
 
-namespace Todoweb.Model.Endpoints
+namespace Todoweb.Backend.Model.Endpoints
 {
     public static class TodoEndpoints
     {
@@ -21,9 +22,9 @@ namespace Todoweb.Model.Endpoints
             group.MapDelete("/", DeleteTodo);
         }
 
-        static async Task<Ok<List<TodoItemDto>>> GetAllTodos(TodoDb db)
+        static async Task<Ok<List<TodoItemDto>>> GetAllTodos(ITodoService service)
         {
-            return TypedResults.Ok(await db.Todos.Select(x => new TodoItemDto(x)).ToListAsync());
+            return TypedResults.Ok(await service.GetAllASync());
         }
 
         static async Task<Ok<List<TodoItemDto>>> GetCompleteTodos(TodoDb db)

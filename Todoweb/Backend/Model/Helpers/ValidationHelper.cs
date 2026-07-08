@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Todoweb.Model.Helpers
+namespace Todoweb.Backend.Model.Helpers
 {
     public class ValidationHelper
     {

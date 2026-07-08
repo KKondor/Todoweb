@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Model\APITests\" />
+    <Folder Include="Backend\Model\APITests\" />
   </ItemGroup>
 
 </Project>
