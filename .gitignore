@@ -362,3 +362,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /Todoweb/Todoweb.http
+/Todoweb/Model/API/Todoweb.http
+/Todoweb/Model/API/Todoweb.http

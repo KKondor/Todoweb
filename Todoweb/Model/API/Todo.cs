@@ -1,4 +1,6 @@
-﻿namespace Todoweb.Model.API
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Todoweb.Model.API
 {
     public class Todo
     {
@@ -8,6 +10,7 @@
             Normal_Priority,
             Urgent_Priority
         }
+        [Key]
         public int Id { get; set; }
         public string? Name { get; set; }
         public Priority TodoPriority { get; set; } = Priority.Low_Priority;
