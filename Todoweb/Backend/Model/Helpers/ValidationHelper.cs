@@ -11,5 +11,9 @@ namespace Todoweb.Backend.Model.Helpers
             Validator.TryValidateObject(obj!, context, results, validateAllProperties: true);
             return results;
         }
+        public static Dictionary<string, string[]> ToValidationDictionary(List<ValidationResult> results)
+        {
+            return results.SelectMany(x => x.MemberNames, (result,membernames)=> new {membernames, result.ErrorMessage}).GroupBy(x=>x.membernames).ToDictionary(g => g.Key,g => g.Select(x => x.ErrorMessage).ToArray());
+        }
     }
 }

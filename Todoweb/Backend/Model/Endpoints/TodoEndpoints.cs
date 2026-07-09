@@ -49,22 +49,28 @@ namespace Todoweb.Backend.Model.Endpoints
                     : TypedResults.NotFound();
         }
 
-        static async Task<Results<Created<TodoItemDto>,BadRequest<List<ValidationResult>>>> CreateTodo(TodoItemDto todo, ITodoService service)
+        static async Task<Results<Created<TodoItemDto>,ValidationProblem>> CreateTodo(TodoItemDto todo, ITodoService service)
         {
             var errors = ValidationHelper.Validate(todo);
             if (errors.Count > 0)
-                return TypedResults.BadRequest(errors);
+            {
+                var problemDict = ValidationHelper.ToValidationDictionary(errors);
+                return TypedResults.ValidationProblem(problemDict);
+            }
 
             var savedTodo = await service.CreateTodoAsync(todo);
 
             return TypedResults.Created($"/todoitems/{savedTodo.Id}", savedTodo);
         }
 
-        static async Task<Results<NoContent,NotFound,BadRequest<List<ValidationResult>>>> UpdateTodo(int id, TodoItemDto inputTodo, ITodoService service)
+        static async Task<Results<NoContent,NotFound,ValidationProblem>> UpdateTodo(int id, TodoItemDto inputTodo, ITodoService service)
         {
             var errors = ValidationHelper.Validate(inputTodo);
             if (errors.Count > 0)
-                return TypedResults.BadRequest(errors);
+            {
+                var problemDict = ValidationHelper.ToValidationDictionary(errors);
+                return TypedResults.ValidationProblem(problemDict);
+            }
 
             var todo = await service.UpdateTodoAsync(id,inputTodo);
 
@@ -79,11 +85,14 @@ namespace Todoweb.Backend.Model.Endpoints
             return TypedResults.NotFound();
         }
 
-        static async Task<Results<NoContent, NotFound, BadRequest<List<ValidationResult>>>> PatchTodo(int id, TodoPatchDto inputTodo, ITodoService service)
+        static async Task<Results<NoContent, NotFound, ValidationProblem>> PatchTodo(int id, TodoPatchDto inputTodo, ITodoService service)
         {
             var errors = ValidationHelper.Validate(inputTodo);
             if (errors.Count > 0)
-                return TypedResults.BadRequest(errors);
+            {
+                var problemDict = ValidationHelper.ToValidationDictionary(errors);
+                return TypedResults.ValidationProblem(problemDict);
+            }
 
             var todo = await service.PatchTodoAsync(id,inputTodo);
 
