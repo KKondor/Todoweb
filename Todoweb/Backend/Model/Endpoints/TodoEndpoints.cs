@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using Todoweb.Backend.Model.API;
 using Todoweb.Backend.Model.Helpers;
@@ -24,96 +23,71 @@ namespace Todoweb.Backend.Model.Endpoints
 
         static async Task<Ok<List<TodoItemDto>>> GetAllTodos(ITodoService service)
         {
-            return TypedResults.Ok(await service.GetAllASync());
+            return TypedResults.Ok(await service.GetAllAsync());
         }
 
-        static async Task<Ok<List<TodoItemDto>>> GetCompleteTodos(TodoDb db)
+        static async Task<Ok<List<TodoItemDto>>> GetCompleteTodos(ITodoService service)
         {
-            return TypedResults.Ok(await db.Todos.Where(t => t.IsComplete).Select(x => new TodoItemDto(x)).ToListAsync());
+            return TypedResults.Ok(await service.GetCompletedAsync());
         }
 
-        static async Task<Ok<List<TodoItemDto>>> GetNotCompleteTodos(TodoDb db)
+        static async Task<Ok<List<TodoItemDto>>> GetNotCompleteTodos(ITodoService service)
         {
-            return TypedResults.Ok(await db.Todos.Where(t => !t.IsComplete).Select(x => new TodoItemDto(x)).ToListAsync());
+            return TypedResults.Ok(await service.GetNotCompletedAsync());
         }
 
-        static async Task<Ok<List<TodoItemDto>>> GetPriorityTodos(Todo.Priority todoPriority, TodoDb db)
+        static async Task<Ok<List<TodoItemDto>>> GetPriorityTodos(Todo.Priority todoPriority, ITodoService service)
         {
-            return TypedResults.Ok(await db.Todos.Where(t => t.TodoPriority == todoPriority).Select(x => new TodoItemDto(x)).ToListAsync());
+            return TypedResults.Ok(await service.GetPriorityAsync(todoPriority));
         }
 
-        static async Task<Results<Ok<TodoItemDto>,NotFound>> GetTodo(int id, TodoDb db)
+        static async Task<Results<Ok<TodoItemDto>,NotFound>> GetTodo(int id, ITodoService service)
         {
-            return await db.Todos.FindAsync(id)
-                is Todo todo
-                    ? TypedResults.Ok(new TodoItemDto(todo))
+            return await service.GetTodoByIdAsync(id)
+                is TodoItemDto todo
+                    ? TypedResults.Ok(todo)
                     : TypedResults.NotFound();
         }
 
-        static async Task<Results<Created<TodoItemDto>,BadRequest<List<ValidationResult>>>> CreateTodo(Todo todo, TodoDb db)
+        static async Task<Results<Created<TodoItemDto>,BadRequest<List<ValidationResult>>>> CreateTodo(TodoItemDto todo, ITodoService service)
         {
             var errors = ValidationHelper.Validate(todo);
             if (errors.Count > 0)
                 return TypedResults.BadRequest(errors);
 
-            db.Todos.Add(todo);
-            await db.SaveChangesAsync();
+            var savedTodo = await service.CreateTodoAsync(todo);
 
-            TodoItemDto tododto = new TodoItemDto(todo);
-
-            return TypedResults.Created($"/todoitems/{todo.Id}", tododto);
+            return TypedResults.Created($"/todoitems/{savedTodo.Id}", savedTodo);
         }
 
-        static async Task<Results<NoContent,NotFound,BadRequest<List<ValidationResult>>>> UpdateTodo(int id, TodoItemDto inputTodo, TodoDb db)
+        static async Task<Results<NoContent,NotFound,BadRequest<List<ValidationResult>>>> UpdateTodo(int id, TodoItemDto inputTodo, ITodoService service)
         {
             var errors = ValidationHelper.Validate(inputTodo);
             if (errors.Count > 0)
                 return TypedResults.BadRequest(errors);
 
-            var todo = await db.Todos.FindAsync(id);
+            var todo = await service.UpdateTodoAsync(id,inputTodo);
 
             if (todo is null) return TypedResults.NotFound();
-
-            todo.Name = inputTodo.Name;
-            todo.IsComplete = inputTodo.IsComplete;
-            todo.TodoPriority = inputTodo.TodoPriority;
-            todo.Description = inputTodo.Description;
-            todo.DueDate = inputTodo.DueDate;
-
-            await db.SaveChangesAsync();
-
             return TypedResults.NoContent();
         }
 
-        static async Task<Results<NoContent,NotFound>> DeleteTodo(int id, TodoDb db)
+        static async Task<Results<NoContent,NotFound>> DeleteTodo(int id, ITodoService service)
         {
-            if (await db.Todos.FindAsync(id) is Todo todo)
-            {
-                db.Todos.Remove(todo);
-                await db.SaveChangesAsync();
-                return TypedResults.NoContent();
-            }
-
+            bool result = await service.DeleteTodoAsync(id);
+            if (result) return TypedResults.NoContent();
             return TypedResults.NotFound();
         }
 
-        static async Task<Results<NoContent, NotFound, BadRequest<List<ValidationResult>>>> PatchTodo(int id, TodoPatchDto inputTodo, TodoDb db)
+        static async Task<Results<NoContent, NotFound, BadRequest<List<ValidationResult>>>> PatchTodo(int id, TodoPatchDto inputTodo, ITodoService service)
         {
             var errors = ValidationHelper.Validate(inputTodo);
             if (errors.Count > 0)
                 return TypedResults.BadRequest(errors);
 
-            var todo = await db.Todos.FindAsync(id);
+            var todo = await service.PatchTodoAsync(id,inputTodo);
 
             if (todo is null) return TypedResults.NotFound();
-
-            if (inputTodo.Name is not null) todo.Name = inputTodo.Name;
-            if (inputTodo.IsComplete is not null) todo.IsComplete = inputTodo.IsComplete.Value;
-            if (inputTodo.Description is not null) todo.Description = inputTodo.Description;
-            if (inputTodo.TodoPriority is not null) todo.TodoPriority = inputTodo.TodoPriority.Value;
-            if (inputTodo.DueDate is not null) todo.DueDate = inputTodo.DueDate;
-
-            await db.SaveChangesAsync();
 
             return TypedResults.NoContent();
         }
