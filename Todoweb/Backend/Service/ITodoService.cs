@@ -5,9 +5,7 @@ namespace Todoweb.Backend.Service
     public interface ITodoService
     {
         Task<List<TodoItemDto>> GetAllAsync();
-        Task<List<TodoItemDto>> GetCompletedAsync();
-        Task<List<TodoItemDto>> GetNotCompletedAsync();
-        Task<List<TodoItemDto>> GetPriorityAsync(Todo.Priority priority);
+        Task<List<TodoItemDto>> GetFilteredAsync(string? name, bool? isComplete, Todo.Priority? priority);
         Task<TodoItemDto?> GetTodoByIdAsync(int id);
         Task<TodoItemDto> CreateTodoAsync(TodoItemDto todo);
         Task<TodoItemDto?> UpdateTodoAsync(int id, TodoItemDto todo);

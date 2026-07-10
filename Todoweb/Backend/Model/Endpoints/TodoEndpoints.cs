@@ -10,10 +10,7 @@ namespace Todoweb.Backend.Model.Endpoints
     {
         public static void MapTodoEndpoints(this IEndpointRouteBuilder group)
         {
-            group.MapGet("/", GetAllTodos);
-            group.MapGet("/complete", GetCompleteTodos);
-            group.MapGet("/notcomplete", GetNotCompleteTodos);
-            group.MapGet("/priority/{todoPriority}", GetPriorityTodos);
+            group.MapGet("/", GetFilteredTodos);
             group.MapGet("/{id}", GetTodo);
             group.MapPost("/", CreateTodo);
             group.MapPut("/{id}", UpdateTodo);
@@ -26,21 +23,10 @@ namespace Todoweb.Backend.Model.Endpoints
             return TypedResults.Ok(await service.GetAllAsync());
         }
 
-        static async Task<Ok<List<TodoItemDto>>> GetCompleteTodos(ITodoService service)
+        static async Task<Ok<List<TodoItemDto>>> GetFilteredTodos(string? name, bool? isComplete, Todo.Priority? priority, ITodoService service)
         {
-            return TypedResults.Ok(await service.GetCompletedAsync());
+            return TypedResults.Ok(await service.GetFilteredAsync(name, isComplete, priority));
         }
-
-        static async Task<Ok<List<TodoItemDto>>> GetNotCompleteTodos(ITodoService service)
-        {
-            return TypedResults.Ok(await service.GetNotCompletedAsync());
-        }
-
-        static async Task<Ok<List<TodoItemDto>>> GetPriorityTodos(Todo.Priority todoPriority, ITodoService service)
-        {
-            return TypedResults.Ok(await service.GetPriorityAsync(todoPriority));
-        }
-
         static async Task<Results<Ok<TodoItemDto>,NotFound>> GetTodo(int id, ITodoService service)
         {
             return await service.GetTodoByIdAsync(id)

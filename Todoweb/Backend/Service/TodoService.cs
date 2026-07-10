@@ -12,22 +12,10 @@ namespace Todoweb.Backend.Service
             var todos = await _repo.GetAllAsync();
             return todos.Select(x => new TodoItemDto(x)).ToList();
         }
-        public async Task<List<TodoItemDto>> GetCompletedAsync()
+        public async Task<List<TodoItemDto>> GetFilteredAsync(string? name, bool? isComplete, Todo.Priority? priority)
         {
-            var completedTodos = await _repo.GetCompletedAsync();
-            return completedTodos.Select(x => new TodoItemDto(x)).ToList();
-        }
-
-        public async Task<List<TodoItemDto>> GetNotCompletedAsync()
-        {
-            var completedTodos = await _repo.GetNotCompletedAsync();
-            return completedTodos.Select(x => new TodoItemDto(x)).ToList();
-        }
-
-        public async Task<List<TodoItemDto>> GetPriorityAsync(Todo.Priority priority)
-        {
-            var priorityTodos = await _repo.GetPriorityAsync(priority);
-            return priorityTodos.Select(x => new TodoItemDto(x)).ToList();
+            var todos = await _repo.GetFilteredAsync(name, isComplete, priority);
+            return todos.Select(x => new TodoItemDto(x)).ToList();
         }
         public async Task<TodoItemDto?> GetTodoByIdAsync(int id)
         {

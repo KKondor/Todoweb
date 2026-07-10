@@ -9,11 +9,20 @@ namespace Todoweb.Backend.Repositories
         public TodoRepository(TodoDb todoDb) => _todoDb = todoDb;
 
         public async Task<List<Todo>> GetAllAsync() => await _todoDb.Todos.ToListAsync();
+        public async Task<List<Todo>> GetFilteredAsync(string? name, bool? isComplete, Todo.Priority? priority)
+        {
+            var query = _todoDb.Todos.AsQueryable();
 
-        public async Task<List<Todo>> GetCompletedAsync() => await _todoDb.Todos.Where(t => t.IsComplete).ToListAsync();
+            if (!string.IsNullOrWhiteSpace(name))
+                query = query.Where(t => t.Name.Contains(name));
+            if (isComplete.HasValue)
+                query = query.Where(t => t.IsComplete == isComplete.Value);
+            if (priority.HasValue)
+                query = query.Where(t => t.TodoPriority == priority.Value);
 
-        public async Task<List<Todo>> GetNotCompletedAsync() => await _todoDb.Todos.Where(t => !t.IsComplete).ToListAsync();
-        public async Task<List<Todo>> GetPriorityAsync(Todo.Priority todoPriority) => await _todoDb.Todos.Where(t=>t.TodoPriority == todoPriority).ToListAsync();
+            return await query.ToListAsync();
+        }
+
         public async Task<Todo?> GetTodoByIdAsync(int id) => await _todoDb.Todos.FindAsync(id);
         public async Task<Todo> CreateTodoAsync(Todo todo) {
             var result = await _todoDb.Todos.AddAsync(todo);
