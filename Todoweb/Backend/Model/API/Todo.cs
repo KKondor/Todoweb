@@ -19,7 +19,7 @@ namespace Todoweb.Backend.Model.API
         [MaxLength(1000)]
         public string? Description { get; set; }
         public bool IsComplete { get; set; } = false;
-        public DateTime CreateDate { get;} = DateTime.Now;
+        public DateTime CreateDate { get; private set; } = DateTime.Now;
         public DateTime? DueDate { get; set; }
     }
 }
