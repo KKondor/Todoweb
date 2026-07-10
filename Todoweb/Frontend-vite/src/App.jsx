@@ -49,8 +49,9 @@ function App() {
     }
 
     return (
-        <div className="App">
-            <h1>Todo Items</h1>
+        <div className="app-container">
+            <h1 className="title">Todo Items</h1>
+
             <TodoForm
                 existingTodo={editingTodo}
                 onTodoCreated={(newTodo) => setItems([...items, newTodo])}
@@ -59,34 +60,68 @@ function App() {
                     setEditingTodo(null);
                 }}
             />
-            <div>
-                <label htmlFor="nameFilter">Search Name</label>
-                <input id="nameFilter" value={searchName} onChange={(e) => setSearchName(e.target.value)}/>
-                <label htmlFor="isCompleteFilter">Filter Completed</label>
-                <select id="isCompleteFilter" value={filterComplete} onChange={(e) => setFilterComplete(e.target.value)}>
-                    <option value="">All</option>
-                    <option value="true">Completed</option>
-                    <option value="false">Not Completed</option>
-                </select>
-                <label htmlFor="priorityFilter">Filter Priority</label>
-                <select id="priorityFilter" value={filterPriority} onChange={(e) =>  setFilterPriority(e.target.value)}>
-                    <option value="">All Priorities</option>
-                    <option value="0">Low Priority</option>
-                    <option value="1">Normal Priority</option>
-                    <option value="2">Urgent Priority</option>
-                </select>
+
+            {/* Filters */}
+            <div className="filters">
+                <div className="filter-group">
+                    <label>Search Name</label>
+                    <input
+                        value={searchName}
+                        onChange={(e) => setSearchName(e.target.value)}
+                        placeholder="Search by name..."
+                    />
+                </div>
+
+                <div className="filter-group">
+                    <label>Completed</label>
+                    <select value={filterComplete} onChange={(e) => setFilterComplete(e.target.value)}>
+                        <option value="">All</option>
+                        <option value="true">Completed</option>
+                        <option value="false">Not Completed</option>
+                    </select>
+                </div>
+
+                <div className="filter-group">
+                    <label>Priority</label>
+                    <select value={filterPriority} onChange={(e) => setFilterPriority(e.target.value)}>
+                        <option value="">All</option>
+                        <option value="0">Low</option>
+                        <option value="1">Normal</option>
+                        <option value="2">Urgent</option>
+                    </select>
+                </div>
             </div>
-            <ul>
-                {items.map((item) => (
-                    <li key={item.id}>
-                        {item.name} - {item.description} - {item.isComplete ? "Complete" : "Incomplete"} - Priority: {priorityLabels[item.todoPriority]} | Created at: {formatDate(item.createDate)} Due at: {formatDate(item.dueDate)}
-                        <button onClick={() => setEditingTodo(item)}>Edit</button>
-                        <button onClick={() => handleDelete(item.id)}>Delete</button>
-                    </li>
+
+            {/* Todo List */}
+            <div className="todo-list">
+                {items.map(item => (
+                    <div key={item.id} className="todo-card">
+                        <div className="todo-header">
+                            <h3>{item.name}</h3>
+                            <span className={`priority p-${item.todoPriority}`}>
+                                {priorityLabels[item.todoPriority]}
+                            </span>
+                        </div>
+
+                        <p className="description">{item.description}</p>
+
+                        <p className="meta">
+                            <strong>Status:</strong> {item.isComplete ? "Complete" : "Incomplete"}
+                            <br />
+                            <strong>Created:</strong> {formatDate(item.createDate)}
+                            <br />
+                            <strong>Due:</strong> {formatDate(item.dueDate)}
+                        </p>
+
+                        <div className="actions">
+                            <button className="edit-btn" onClick={() => setEditingTodo(item)}>Edit</button>
+                            <button className="delete-btn" onClick={() => handleDelete(item.id)}>Delete</button>
+                        </div>
+                    </div>
                 ))}
-            </ul>
+            </div>
         </div>
-    )
+    );
 }
 
 export default App

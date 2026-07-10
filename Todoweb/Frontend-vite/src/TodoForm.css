@@ -1,0 +1,55 @@
+.todo-form {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    color: #ffffff;
+    background: #353535;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #ff6b01;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-title {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group input,
+.form-group select {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.checkbox-group {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.submit-btn {
+    background: #4caf50;
+    color: white;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    background: #43a047;
+}
