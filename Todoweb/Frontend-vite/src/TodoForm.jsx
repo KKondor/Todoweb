@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, forwardRef } from 'react'
 import { buildDueDate } from "./utils/buildDueDate.js";
 import { splitDateTime } from "./utils/splitDateTime.js";
 import './TodoForm.css';
 
-function TodoForm({ onTodoCreated, onTodoUpdated, existingTodo }) {
+const TodoForm = forwardRef(function TodoForm({ onTodoCreated, onTodoUpdated, existingTodo },ref) {
     const [name, setName] = useState(existingTodo?.name ?? '');
     const [description, setDescription] = useState(existingTodo?.description ?? '');
     const [isComplete, setIsComplete] = useState(existingTodo?.isComplete ?? false);
@@ -62,7 +62,7 @@ function TodoForm({ onTodoCreated, onTodoUpdated, existingTodo }) {
 
     return (
 
-        <form className="todo-form" onSubmit={handleSubmit}>
+        <form ref={ref} className="todo-form" onSubmit={handleSubmit}>
             {error && (
                 <div className="error-box">
                     {error}
@@ -129,6 +129,6 @@ function TodoForm({ onTodoCreated, onTodoUpdated, existingTodo }) {
             </button>
         </form>
     );
-}
+})
 
 export default TodoForm;

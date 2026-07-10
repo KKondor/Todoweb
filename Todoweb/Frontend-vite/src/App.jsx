@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { formatDate } from './utils/formatDate.js'
 import TodoForm from "./TodoForm.jsx";
 import './App.css'
@@ -13,6 +13,7 @@ function App() {
     const [filterPriority, setFilterPriority] = useState(''); // '', '0', '1', '2'
     const [error, setError] = useState(null);
     const priorityLabels = ['Low Priority', 'Normal Priority', 'Urgent Priority'];
+    const formRef = useRef(null);
 
     async function getItems()
     {
@@ -69,6 +70,7 @@ function App() {
                 </div>
             )}
             <TodoForm
+                ref={formRef}
                 existingTodo={editingTodo}
                 onTodoCreated={(newTodo) => setItems([...items, newTodo])}
                 onTodoUpdated={(updatedTodo) => {
@@ -126,7 +128,8 @@ function App() {
                         </p>
 
                         <div className="actions">
-                            <button className="edit-btn" onClick={() => setEditingTodo(item)}>Edit</button>
+                            <button className="edit-btn" onClick={() => {setEditingTodo(item);
+                            formRef.current?.scrollIntoView({behavior: "smooth"})}}>Edit</button>
                             <button className="delete-btn" onClick={() => handleDelete(item.id)}>Delete</button>
                         </div>
                     </div>
