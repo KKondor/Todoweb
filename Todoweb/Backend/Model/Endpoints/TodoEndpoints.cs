@@ -63,7 +63,7 @@ namespace Todoweb.Backend.Model.Endpoints
             return TypedResults.Created($"/todoitems/{savedTodo.Id}", savedTodo);
         }
 
-        static async Task<Results<NoContent,NotFound,ValidationProblem>> UpdateTodo(int id, TodoItemDto inputTodo, ITodoService service)
+        static async Task<Results<Created<TodoItemDto>,NotFound,ValidationProblem>> UpdateTodo(int id, TodoItemDto inputTodo, ITodoService service)
         {
             var errors = ValidationHelper.Validate(inputTodo);
             if (errors.Count > 0)
@@ -75,7 +75,7 @@ namespace Todoweb.Backend.Model.Endpoints
             var todo = await service.UpdateTodoAsync(id,inputTodo);
 
             if (todo is null) return TypedResults.NotFound();
-            return TypedResults.NoContent();
+            return TypedResults.Created($"/todoitems/{todo.Id}", todo);
         }
 
         static async Task<Results<NoContent,NotFound>> DeleteTodo(int id, ITodoService service)
@@ -85,7 +85,7 @@ namespace Todoweb.Backend.Model.Endpoints
             return TypedResults.NotFound();
         }
 
-        static async Task<Results<NoContent, NotFound, ValidationProblem>> PatchTodo(int id, TodoPatchDto inputTodo, ITodoService service)
+        static async Task<Results<Created<TodoItemDto>, NotFound, ValidationProblem>> PatchTodo(int id, TodoPatchDto inputTodo, ITodoService service)
         {
             var errors = ValidationHelper.Validate(inputTodo);
             if (errors.Count > 0)
@@ -98,7 +98,7 @@ namespace Todoweb.Backend.Model.Endpoints
 
             if (todo is null) return TypedResults.NotFound();
 
-            return TypedResults.NoContent();
+            return TypedResults.Created($"/todoitems/{todo.Id}", todo);
         }
     }
 }
