@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /Todoweb/Model/API/Todoweb.http
 /Todoweb/Model/API/Todoweb.http
 /Todoweb/Frontend-vite/.env
+/.idea/
