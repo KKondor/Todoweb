@@ -11,18 +11,29 @@ function App() {
     const [searchName, setSearchName] = useState('');
     const [filterComplete, setFilterComplete] = useState(''); // '', 'true', 'false'
     const [filterPriority, setFilterPriority] = useState(''); // '', '0', '1', '2'
+    const [error, setError] = useState(null);
     const priorityLabels = ['Low Priority', 'Normal Priority', 'Urgent Priority'];
 
-    async function getItems() {
-        const params = new URLSearchParams();
-        if (searchName) params.append("name", searchName);
-        if (filterComplete) params.append("isComplete", filterComplete);
-        if (filterPriority) params.append("priority", filterPriority);
-        const url = `${baseUrl}/todoitems?${params.toString()}`;
+    async function getItems()
+    {
+        try {
+            const params = new URLSearchParams();
+            if (searchName) params.append("name", searchName);
+            if (filterComplete) params.append("isComplete", filterComplete);
+            if (filterPriority) params.append("priority", filterPriority);
+            const url = `${baseUrl}/todoitems?${params.toString()}`;
 
-        const response = await fetch(url);
-        const data = await response.json();
-        setItems(data);
+            const response = await fetch(url);
+            if (!response.ok){
+                setError("Failed to load items from the server.");
+                return;
+            }
+            const data = await response.json();
+            setItems(data);
+        }
+        catch (error) {
+            setError("Cannot connect to the server.");
+        }
     }
     useEffect(() => {
         const timerId = setTimeout(() => {
@@ -41,7 +52,8 @@ function App() {
         });
 
         if (!response.ok) {
-            console.log('Delete failed');
+            const problem = await response.json();
+            setError(problem.title || "Something went wrong while deleting.");
             return;
         }
 
@@ -51,7 +63,11 @@ function App() {
     return (
         <div className="app-container">
             <h1 className="title">Todo Items</h1>
-
+            {error && (
+                <div className="error-box">
+                    {error}
+                </div>
+            )}
             <TodoForm
                 existingTodo={editingTodo}
                 onTodoCreated={(newTodo) => setItems([...items, newTodo])}
@@ -60,8 +76,6 @@ function App() {
                     setEditingTodo(null);
                 }}
             />
-
-            {/* Filters */}
             <div className="filters">
                 <div className="filter-group">
                     <label>Search Name</label>
@@ -91,8 +105,6 @@ function App() {
                     </select>
                 </div>
             </div>
-
-            {/* Todo List */}
             <div className="todo-list">
                 {items.map(item => (
                     <div key={item.id} className="todo-card">

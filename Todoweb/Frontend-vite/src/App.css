@@ -1,5 +1,5 @@
 .app-container {
-    width: 100%;
+    width: 85%;
     max-width: 1200px;   /* Increase width */
     margin: 0 auto;      /* Center it */
     padding: 20px;
@@ -13,8 +13,11 @@
 
 .filters {
   display: flex;
+  justify-content: center;
   gap: 20px;
   margin-bottom: 20px;
+  margin-top: 20px;
+  flex-wrap: wrap;
 }
 
 .filter-group {
@@ -100,4 +103,14 @@
 
 .delete-btn:hover {
   background: #d32f2f;
+}
+
+.error-box {
+  background: #ffe5e5;
+  color: #b30000;
+  padding: 12px 16px;
+  border: 1px solid #ffb3b3;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-weight: 500;
 }

@@ -8,7 +8,7 @@ function TodoForm({ onTodoCreated, onTodoUpdated, existingTodo }) {
     const [description, setDescription] = useState(existingTodo?.description ?? '');
     const [isComplete, setIsComplete] = useState(existingTodo?.isComplete ?? false);
     const [priority, setPriority] = useState(existingTodo?.todoPriority ?? '0');
-
+    const [error, setError] = useState(null);
     const { date: initialDate, time: initialTime } = splitDateTime(existingTodo?.dueDate) ?? {};
     const [dueDate, setDueDate] = useState(initialDate ?? '');
     const [dueTime, setDueTime] = useState(initialTime ?? '');
@@ -47,7 +47,12 @@ function TodoForm({ onTodoCreated, onTodoUpdated, existingTodo }) {
 
         if (!response.ok) {
             const problem = await response.json();
-            console.log(problem);
+            const firstErrorKey = Object.keys(problem.errors ?? {})[0];
+            const firstErrorMessage = firstErrorKey
+                ? problem.errors[firstErrorKey][0]
+                : problem.title ?? "An unknown error occurred.";
+
+            setError(firstErrorMessage);
             return;
         }
 
@@ -56,7 +61,13 @@ function TodoForm({ onTodoCreated, onTodoUpdated, existingTodo }) {
     }
 
     return (
+
         <form className="todo-form" onSubmit={handleSubmit}>
+            {error && (
+                <div className="error-box">
+                    {error}
+                </div>
+            )}
             <h2 className="form-title">{existingTodo ? "Edit Todo" : "Create Todo"}</h2>
 
             <div className="form-group">
