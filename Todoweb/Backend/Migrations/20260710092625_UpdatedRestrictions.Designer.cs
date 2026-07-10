@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Todoweb.Backend.Model.API;
 
@@ -11,9 +12,11 @@ using Todoweb.Backend.Model.API;
 namespace Todoweb.Migrations
 {
     [DbContext(typeof(TodoDb))]
-    partial class TodoDbModelSnapshot : ModelSnapshot
+    [Migration("20260710092625_UpdatedRestrictions")]
+    partial class UpdatedRestrictions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
