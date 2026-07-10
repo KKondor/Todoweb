@@ -18,7 +18,7 @@ namespace Todoweb.Backend.Model.Endpoints
             group.MapPost("/", CreateTodo);
             group.MapPut("/{id}", UpdateTodo);
             group.MapPatch("/{id}", PatchTodo);
-            group.MapDelete("/", DeleteTodo);
+            group.MapDelete("/{id}", DeleteTodo);
         }
 
         static async Task<Ok<List<TodoItemDto>>> GetAllTodos(ITodoService service)
