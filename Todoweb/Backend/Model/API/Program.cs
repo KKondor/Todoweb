@@ -12,7 +12,7 @@ builder.Services.AddCors(opt =>
 {
     opt.AddPolicy(name: MyAllowedSpecificOrigins, policy =>
     {
-        policy.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod();
+        policy.WithOrigins(builder.Configuration.GetConnectionString("DefaultFrontEnd")).AllowAnyHeader().AllowAnyMethod();
     });
 }
 );
@@ -21,7 +21,7 @@ builder.Services.AddScoped<ITodoRepository, TodoRepository>();
 builder.Services.AddScoped<ITodoService, TodoService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<TodoDb>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+builder.Services.AddDbContext<TodoDb>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultDB")));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 var app = builder.Build();
 app.UseExceptionHandler(exceptionHandlerApp
