@@ -10,12 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddProblemDetails();
 builder.Services.AddCors(opt =>
 {
-    opt.AddPolicy(name: MyAllowedSpecificOrigins, policy =>
+    opt.AddPolicy(MyAllowedSpecificOrigins, policy =>
     {
-        policy.WithOrigins(builder.Configuration.GetConnectionString("DefaultFrontEnd")).AllowAnyHeader().AllowAnyMethod();
+        policy.WithOrigins(builder.Configuration["DefaultFrontEnd"])
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
-}
-);
+});
 
 builder.Services.AddScoped<ITodoRepository, TodoRepository>();
 builder.Services.AddScoped<ITodoService, TodoService>();
