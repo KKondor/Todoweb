@@ -32,7 +32,7 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<TodoDb>();
     db.Database.Migrate();
 }
-
+app.UseCors(MyAllowedSpecificOrigins);
 app.UseExceptionHandler(exceptionHandlerApp
     => exceptionHandlerApp.Run(async context => await Results.Problem().ExecuteAsync(context)));
 app.UseStatusCodePages(statusCodeHandlerApp =>
@@ -47,7 +47,6 @@ app.UseStatusCodePages(statusCodeHandlerApp =>
         }
     });
 });
-app.UseCors(MyAllowedSpecificOrigins);
 app.MapGroup("/todoitems").WithTags("TodoModel").MapTodoEndpoints();
 app.UseSwagger();
 app.UseSwaggerUI();
