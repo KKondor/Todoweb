@@ -56,7 +56,7 @@ dotnet user-secrets set "ConnectionStrings:DefaultFrontEnd" "http://localhost:51
 
 Adjust the `DefaultDB` connection string to match your own SQL Server instance name and authentication method (Windows Auth vs. SQL login). `DefaultFrontEnd` should match whatever origin your frontend dev server runs on (Vite's default is `http://localhost:5173`) — this is used for the CORS policy.
 
-### 2.2 Apply database migrations
+### 2.2 Apply database migrations.
 
 This creates the database schema (tables, columns, etc.) based on the current EF Core models.
 
