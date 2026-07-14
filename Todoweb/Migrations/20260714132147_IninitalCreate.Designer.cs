@@ -12,8 +12,8 @@ using Todoweb.Backend.Model.API;
 namespace Todoweb.Migrations
 {
     [DbContext(typeof(TodoDb))]
-    [Migration("20260710092625_UpdatedRestrictions")]
-    partial class UpdatedRestrictions
+    [Migration("20260714132147_IninitalCreate")]
+    partial class IninitalCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,9 @@ namespace Todoweb.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
