@@ -2,6 +2,11 @@
 
 A full-stack Todo application with a C# / ASP.NET Core Minimal API backend (EF Core + SQL Server) and a React (Vite) frontend.
 
+## Demo
+Demo of this project is available at: https://todoweb-tau.vercel.app/
+
+Please note that due to the hosting service the backend may take a while to boot up. 
+
 ## Tech Stack
 
 - **Backend:** ASP.NET Core Minimal API, Entity Framework Core, SQL Server
