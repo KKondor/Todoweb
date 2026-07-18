@@ -9,14 +9,25 @@ function App() {
     const [items, setItems] = useState([]);
     const [editingTodo, setEditingTodo] = useState(null);
     const [searchName, setSearchName] = useState('');
-    const [filterComplete, setFilterComplete] = useState(''); // '', 'true', 'false'
-    const [filterPriority, setFilterPriority] = useState(''); // '', '0', '1', '2'
+    const [filterComplete, setFilterComplete] = useState('');
+    const [filterPriority, setFilterPriority] = useState('');
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [bootingUp, setBootingUp] = useState(false);
     const priorityLabels = ['Low Priority', 'Normal Priority', 'Urgent Priority'];
     const formRef = useRef(null);
+    const bootTimeoutRef = useRef(null);
 
     async function getItems()
     {
+        setLoading(true);
+        setBootingUp(false);
+        setError(null);
+
+        bootTimeoutRef.current = setTimeout(() => {
+            setBootingUp(true);
+        }, 3000);
+
         try {
             const params = new URLSearchParams();
             if (searchName) params.append("name", searchName);
@@ -34,6 +45,11 @@ function App() {
         }
         catch (error) {
             setError("Cannot connect to the server.");
+        }
+        finally {
+            setLoading(false);
+            setBootingUp(false);
+            clearTimeout(bootTimeoutRef.current);
         }
     }
     useEffect(() => {
@@ -107,34 +123,46 @@ function App() {
                     </select>
                 </div>
             </div>
-            <div className="todo-list">
-                {items.map(item => (
-                    <div key={item.id} className="todo-card">
-                        <div className="todo-header">
-                            <h3>{item.name}</h3>
-                            <span className={`priority p-${item.todoPriority}`}>
-                                {priorityLabels[item.todoPriority]}
-                            </span>
+
+            {loading && (
+                <div className="loading-box">
+                    {bootingUp
+                        ? <p>Server is booting up, please wait (this can take up to a minute)...</p>
+                        : <p>Loading...</p>
+                    }
+                </div>
+            )}
+
+            {!loading && (
+                <div className="todo-list">
+                    {items.map(item => (
+                        <div key={item.id} className="todo-card">
+                            <div className="todo-header">
+                                <h3>{item.name}</h3>
+                                <span className={`priority p-${item.todoPriority}`}>
+                                    {priorityLabels[item.todoPriority]}
+                                </span>
+                            </div>
+
+                            <p className="description">{item.description}</p>
+
+                            <p className="meta">
+                                <strong>Status:</strong> {item.isComplete ? "Complete" : "Incomplete"}
+                                <br />
+                                <strong>Created:</strong> {formatDate(item.createDate)}
+                                <br />
+                                <strong>Due:</strong> {formatDate(item.dueDate)}
+                            </p>
+
+                            <div className="actions">
+                                <button className="edit-btn" onClick={() => {setEditingTodo(item);
+                                    formRef.current?.scrollIntoView({behavior: "smooth"})}}>Edit</button>
+                                <button className="delete-btn" onClick={() => handleDelete(item.id)}>Delete</button>
+                            </div>
                         </div>
-
-                        <p className="description">{item.description}</p>
-
-                        <p className="meta">
-                            <strong>Status:</strong> {item.isComplete ? "Complete" : "Incomplete"}
-                            <br />
-                            <strong>Created:</strong> {formatDate(item.createDate)}
-                            <br />
-                            <strong>Due:</strong> {formatDate(item.dueDate)}
-                        </p>
-
-                        <div className="actions">
-                            <button className="edit-btn" onClick={() => {setEditingTodo(item);
-                            formRef.current?.scrollIntoView({behavior: "smooth"})}}>Edit</button>
-                            <button className="delete-btn" onClick={() => handleDelete(item.id)}>Delete</button>
-                        </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
