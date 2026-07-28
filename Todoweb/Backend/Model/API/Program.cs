@@ -6,7 +6,23 @@ using Todoweb.Backend.Service;
 
 var MyAllowedSpecificOrigins = "_myAllowSpecificOrigins";
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    EnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+});
+
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
+builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: false);
+
+builder.Host.ConfigureAppConfiguration(config =>
+{
+    foreach (var source in config.Sources)
+    {
+        if (source is Microsoft.Extensions.Configuration.FileConfigurationSource fileSource)
+            fileSource.ReloadOnChange = false;
+    }
+});
 builder.Services.AddProblemDetails();
 builder.Services.AddCors(opt =>
 {
@@ -21,8 +37,6 @@ builder.Services.AddCors(opt =>
 
 builder.Services.AddScoped<ITodoRepository, TodoRepository>();
 builder.Services.AddScoped<ITodoService, TodoService>();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<TodoDb>(opt => opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultDB")));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 var app = builder.Build();
@@ -48,6 +62,4 @@ app.UseStatusCodePages(statusCodeHandlerApp =>
     });
 });
 app.MapGroup("/todoitems").WithTags("TodoModel").MapTodoEndpoints();
-app.UseSwagger();
-app.UseSwaggerUI();
 app.Run();
