@@ -7,6 +7,20 @@ using Todoweb.Backend.Service;
 var MyAllowedSpecificOrigins = "_myAllowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
+
+var jsonSources = builder.Configuration.Sources
+    .OfType<Microsoft.Extensions.Configuration.Json.JsonConfigurationSource>()
+    .ToList();
+
+foreach (var source in jsonSources)
+{
+    builder.Configuration.Sources.Remove(source);
+}
+
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: false);
+
 builder.Services.AddProblemDetails();
 builder.Services.AddCors(opt =>
 {
